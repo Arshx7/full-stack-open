@@ -1,14 +1,38 @@
 import { useState } from "react";
 
-const Statistics = (props) => {
+const StatisticLine = ({ text, value }) => {
   return (
     <>
-      <div>good {props.good}</div>
-      <div>neutral {props.neutral}</div>
-      <div>bad {props.bad}</div>
-      <div>all {props.total}</div>
-      <div>average {props.average}</div>
-      <div>positive {props.positive} %</div>
+      <div>
+        {text} {value}
+      </div>
+    </>
+  );
+};
+
+const Statistics = (props) => {
+  if (props.total == 0) {
+    return <h3>No Feedback given</h3>;
+  }
+
+  return (
+    <>
+      <StatisticLine text="good" value={props.good} />
+      <StatisticLine text="neutral" value={props.neutral} />
+      <StatisticLine text="bad" value={props.bad} />
+      <StatisticLine text="all" value={props.total} />
+      <StatisticLine text="average" value={props.average} />
+      <StatisticLine text="positive" value={props.positive} />
+    </>
+  );
+};
+
+const Button = (props) => {
+  return (
+    <>
+      <button onClick={props.handleGood}>good</button>
+      <button onClick={props.handleNeutral}>neutral</button>
+      <button onClick={props.handleBad}>Bad</button>
     </>
   );
 };
@@ -31,28 +55,25 @@ const App = () => {
   const average = (good - bad) / total;
 
   const positive = (good / total) * 100;
-  let checkStat = () => {
-    if (total > 0) {
-      return <Statistics
+
+  return (
+    <div>
+      <h1>Give Feedback</h1>
+      <Button
+        handleGood={handleGood}
+        handleBad={handleBad}
+        handleNeutral={handleNeutral}
+      />
+
+      <h1>statistics</h1>
+      <Statistics
         good={good}
         neutral={neutral}
         bad={bad}
         total={total}
         average={average}
         positive={positive}
-      />;
-    } else {
-      return <div> No Feedback</div>
-    }
-  };
-  return (
-    <div>
-      <h1>Give Feedback</h1>
-      <button onClick={handleGood}>good</button>
-      <button onClick={handleNeutral}>neutral</button>
-      <button onClick={handleBad}>bad</button>
-      <h1>statistics</h1>
-      {checkStat()}
+      />
     </div>
   );
 };
