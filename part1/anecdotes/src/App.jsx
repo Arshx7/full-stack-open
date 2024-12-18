@@ -14,9 +14,17 @@ const App = () => {
   const points = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
   const [selected, setSelected] = useState(0);
   const [votes, setVotes] = useState(points);
+  const [high, setHigh] = useState(0);
 
   function handleNext() {
     let random = Math.floor(Math.random() * anecdotes.length);
+    let max = 0;
+    for (let key in votes) {
+      if (max < votes[key]) {
+        max = votes[key];
+        setHigh(key);
+      }
+    }
     setSelected(random);
   }
 
@@ -28,12 +36,16 @@ const App = () => {
 
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       {anecdotes[selected]}
       <div>has {votes[selected]} votes</div>
       <button onClick={handleNext} style={{ display: "block" }}>
         Next
       </button>
       <button onClick={handleVote}>Vote</button>
+      <h1>Anecdotes with most votes</h1>
+      {anecdotes[high]}
+      <div>has {votes[high]}</div>
     </div>
   );
 };
