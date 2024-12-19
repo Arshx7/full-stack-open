@@ -2,10 +2,12 @@ const Header = ({ course }) => <h1>{course}</h1>;
 
 const Total = ({ parts }) => {
   let sum = 0;
-  for (let i = 0; i < parts.length; i++) {
+  /*  for (let i = 0; i < parts.length; i++) {
     sum += parts[i].exercises;
-  }
-  return <h3>Number of exercises {sum}</h3>;
+  }*/
+  const total = parts.reduce((s, p) => (s += p.exercises), 0);
+
+  return <h3>Number of exercises {total}</h3>;
 };
 
 const Part = ({ part }) => (
