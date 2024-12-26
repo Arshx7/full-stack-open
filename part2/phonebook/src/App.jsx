@@ -41,22 +41,29 @@ const App = () => {
     );
 
     if (personExist) {
-      alert(`${newName} is already added to phonebook`);
+      alert(`${newName} is already added to the phonebook`);
     } else {
-      setPersons(persons.concat(newPerson));
+      personServices.create(newPerson).then((response) => {
+        setPersons(persons.concat(response));
+        setNewName("");
+        setNewNum("");
+      });
     }
-
-    personServices.create(newPerson).then((response) => {
-      console.log(response);
-    });
-
-    setNewName("");
-    setNewNum("");
   }
 
   const searchedList = persons.filter((person) =>
     person.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  function handleDelete(id) {
+    const confirmed = window.confirm("Are you sure you want to delete?");
+    if (confirmed) {
+      personServices.deletePerson(id).then((respons) => {
+        console.log(respons);
+        setPersons(persons.filter((person) => person.id !== id));
+      });
+    }
+  }
 
   return (
     <div>
@@ -74,7 +81,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons searchedList={searchedList} />
+      <Persons searchedList={searchedList} handleDelete={handleDelete} />
     </div>
   );
 };
