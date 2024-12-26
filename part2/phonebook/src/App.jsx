@@ -30,18 +30,39 @@ const App = () => {
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(persons);
     const newPerson = {
       name: newName,
       number: newNum,
     };
 
-    const personExist = persons.some(
+    const personExist = persons.find(
       (person) => person.name === newPerson.name
     );
+    console.log(personExist);
 
     if (personExist) {
-      alert(`${newName} is already added to the phonebook`);
+      const confirmUpdate = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one `
+      );
+
+      if (confirmUpdate) {
+        const updatedPerson = { ...personExist, number: newNum };
+        personServices
+          .update(personExist.id, updatedPerson)
+          .then((response) => {
+            console.log(response);
+            console.log("Before state update:", persons);
+            setPersons(
+              persons.map((person) => {
+                console.log(person.id, personExist.id);
+                return person.id !== personExist.id ? person : response;
+              })
+            );
+            console.log("After state update:", persons);
+            setNewName("");
+            setNewNum("");
+          });
+      }
     } else {
       personServices.create(newPerson).then((response) => {
         setPersons(persons.concat(response));
@@ -58,8 +79,7 @@ const App = () => {
   function handleDelete(id) {
     const confirmed = window.confirm("Are you sure you want to delete?");
     if (confirmed) {
-      personServices.deletePerson(id).then((respons) => {
-        console.log(respons);
+      personServices.deletePerson(id).then(() => {
         setPersons(persons.filter((person) => person.id !== id));
       });
     }
