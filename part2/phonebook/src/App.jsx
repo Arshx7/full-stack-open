@@ -4,13 +4,13 @@ import PersonForm from "./PersonForm";
 import Persons from "./Persons";
 import personServices from "./services/persons";
 import Notification from "./Notification";
-import "./App.css"
+import "./App.css";
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNum, setNewNum] = useState("");
   const [search, setSearch] = useState("");
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState({ text: null, type: null });
 
   useEffect(() => {
     personServices.getAll().then((response) => {
@@ -40,7 +40,6 @@ const App = () => {
     const personExist = persons.find(
       (person) => person.name === newPerson.name
     );
-    console.log(personExist);
 
     if (personExist) {
       const confirmUpdate = window.confirm(
@@ -52,31 +51,40 @@ const App = () => {
         personServices
           .update(personExist.id, updatedPerson)
           .then((response) => {
-            console.log(response);
-            console.log("Before state update:", persons);
             setPersons(
               persons.map((person) => {
-                console.log(person.id, personExist.id);
                 return person.id !== personExist.id ? person : response;
               })
             );
-            setMessage(`Added ${newName}`)
-            console.log("After state update:", persons);
+            setMessage({
+              text: `Added ${newName}`,
+              type: "success",
+            });
+
             setNewName("");
             setNewNum("");
+          })
+          .catch(() => {
+            setMessage({
+              text: `Information of ${newName} has already been removed from server`,
+              type: "error",
+            });
           });
       }
     } else {
       personServices.create(newPerson).then((response) => {
         setPersons(persons.concat(response));
-        setMessage(`Added ${newName}`)
+        setMessage({
+          text: `Added ${newName}`,
+          type: "succes",
+        });
         setNewName("");
         setNewNum("");
       });
     }
     setTimeout(() => {
-      setMessage(null)
-    },3000)
+      setMessage({ text: null, type: null });
+    }, 4000);
   }
 
   const searchedList = persons.filter((person) =>
@@ -95,7 +103,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message ={message} />
+      <Notification message={message} />
       <Filter search={search} handleSearch={handleSearch} />
 
       <h2>Add a new</h2>
