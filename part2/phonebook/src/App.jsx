@@ -3,12 +3,14 @@ import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
 import personServices from "./services/persons";
-
+import Notification from "./Notification";
+import "./App.css"
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNum, setNewNum] = useState("");
   const [search, setSearch] = useState("");
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     personServices.getAll().then((response) => {
@@ -58,6 +60,7 @@ const App = () => {
                 return person.id !== personExist.id ? person : response;
               })
             );
+            setMessage(`Added ${newName}`)
             console.log("After state update:", persons);
             setNewName("");
             setNewNum("");
@@ -66,10 +69,14 @@ const App = () => {
     } else {
       personServices.create(newPerson).then((response) => {
         setPersons(persons.concat(response));
+        setMessage(`Added ${newName}`)
         setNewName("");
         setNewNum("");
       });
     }
+    setTimeout(() => {
+      setMessage(null)
+    },3000)
   }
 
   const searchedList = persons.filter((person) =>
@@ -88,7 +95,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Notification message ={message} />
       <Filter search={search} handleSearch={handleSearch} />
 
       <h2>Add a new</h2>
