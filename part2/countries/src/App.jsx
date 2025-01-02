@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const CountriesList = ({ list }) => {
+const CountriesList = ({ list, handleShow }) => {
   if (list.length > 10) {
     return <div>Too many matches, specify another filter</div>;
   }
@@ -9,7 +9,7 @@ const CountriesList = ({ list }) => {
   if (list.length === 1) {
     let result = list[0];
     console.log(list);
-    
+
     return (
       <>
         <h1>{result.name.common}</h1>
@@ -28,9 +28,14 @@ const CountriesList = ({ list }) => {
 
   return (
     <div>
-      {list.map((res, i) => (
-        <div key={i}>{res.name.common}</div>
-      ))}
+      {list.map((res, i) => {
+        return (
+          <div key={i}>
+            {res.name.common}
+            <button onClick={() => handleShow(res.name.common)}>show</button>
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -39,7 +44,7 @@ function App() {
   const [value, setValue] = useState("");
   const [countries, setCountrie] = useState([]);
 
-  const list =
+  let list =
     !value || value === ""
       ? []
       : countries.filter((countrie) =>
@@ -58,12 +63,16 @@ function App() {
     setValue(event.target.value);
   }
 
+  function handleShow(selectedCountry) {
+    setValue(selectedCountry);
+  }
+
   return (
     <>
       <div>find Countries</div>
       <input value={value} type="text" onChange={handleChange} />
 
-      <CountriesList list={list} />
+      <CountriesList list={list} handleShow={handleShow} />
     </>
   );
 }
