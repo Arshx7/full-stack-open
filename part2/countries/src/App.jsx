@@ -8,7 +8,6 @@ const CountriesList = ({ list, handleShow }) => {
 
   if (list.length === 1) {
     let result = list[0];
-    console.log(list);
 
     return (
       <>
@@ -22,6 +21,7 @@ const CountriesList = ({ list, handleShow }) => {
           ))}
         </ul>
         <img src={result.flags.png} alt={result.flags.alt} />
+        <Weather country={result} />
       </>
     );
   }
@@ -37,6 +37,42 @@ const CountriesList = ({ list, handleShow }) => {
         );
       })}
     </div>
+  );
+};
+
+const Weather = ({ country }) => {
+  const [weather, setWeather] = useState(null);
+
+  let lat = country.capitalInfo.latlng[0];
+  let lon = country.capitalInfo.latlng[1];
+  const api_key = import.meta.env.VITE_SOME_KEY;
+
+  useEffect(() => {
+    axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}&units=metric
+`
+      )
+      .then((response) => {
+        setWeather(response.data);
+      });
+  }, [country]);
+
+  if (!weather) {
+    return <div>Loading weather data</div>;
+  }
+  let temperature = weather.main.temp;
+  let imageSrc = `https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`;
+  let windSpeed = weather.wind.speed;
+  let description = weather.weather[0].description;
+
+  return (
+    <>
+      <h2>Weather in {country.capital}</h2>
+      <p>temperature {temperature} Celsius</p>
+      <img src={imageSrc} alt={description} />
+      <p>wind {windSpeed} m/s</p>
+    </>
   );
 };
 
@@ -71,7 +107,6 @@ function App() {
     <>
       <div>find Countries</div>
       <input value={value} type="text" onChange={handleChange} />
-
       <CountriesList list={list} handleShow={handleShow} />
     </>
   );
